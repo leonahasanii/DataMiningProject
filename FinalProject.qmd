@@ -1,0 +1,21 @@
+---
+title: "Data Mining Project"
+subtitle: "Authors: Leona Hasani, Leona Hoxha, Nanmanat Disayakamonpan"
+format: html
+---
+
+
+```{python}
+#| label: packages-data
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import roc_auc_score
+from sklearn.metrics import roc_curve
+from sklearn.metrics import confusion_matrix
+```
