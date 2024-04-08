@@ -649,6 +649,587 @@ results_weather_median
 ```
 
 
+# MODE IMPUTATION TECHNIQUE
+## VISUALIZING THE NUMBER OF MISSING VALUES IN THE DATA SET
+
+```{python}
+# Checking for missing values
+print("\nMissing values in each column:")
+print(weather.isnull().sum())
+
+# Visualizing missing data pattern
+plt.figure(figsize=(12, 8))
+sns.heatmap(weather.isnull(), cmap='viridis', cbar=False)
+plt.title('Missing Data Pattern')
+plt.show()
+```
+
+## FILLING MISSING VALUES BY MODE
+```{python}
+# Example: Filling missing values with mode
+weather_filled_mode = weather.fillna(weather.mode().iloc[0])
+
+# Checking for missing values
+print("\nMissing values in each column:")
+print(weather_filled_mode.isnull().sum())
+
+# Visualizing missing data pattern
+plt.figure(figsize=(12, 8))
+sns.heatmap(weather_filled_mode.isnull(), cmap='viridis', cbar=False)
+plt.title('Missing Data Pattern')
+plt.show()
+```
+
+## PREPROCESSING STEPS BEFORE MODELLING
+### SPLITTING THE DATA
+```{python}
+X = weather_filled_mode.drop(columns = ['RainTomorrow'])
+y = weather_filled_mode['RainTomorrow']
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Initialize the StandardScaler
+scaler = StandardScaler()
+
+# Fit and transform the training and testing data separately
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.fit_transform(X_test)
+
+# Convert scaled data back to DataFrames
+X_train_scaled_weather = pd.DataFrame(X_train_scaled, columns=X.columns)
+X_test_scaled_weather = pd.DataFrame(X_test_scaled, columns=X.columns)
+```
+
+## MODELING WITH MODE
+### LOGISTIC REGRESSION WITH ALL VARIABLES (MODE)
+```{python}
+#| label: logistic regression with all variables (mode)
+
+# Creatin a performance scores dataframe
+results_weather_mode = pd.DataFrame(columns=['Model', 'Accuracy', 'Precision', 'Recall', 'F1-score', 'ROC AUC Score', 'Computational Time'])
+
+# Start timing
+start_time = time.time()
+
+# Initialize Logistic Regression model
+log_model = LogisticRegression()
+
+# Fit the model on the training data
+log_model.fit(X_train, y_train)
+
+# Make predictions on the testing data
+y_pred = log_model.predict(X_test)
+
+# Calculate performance metrics
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+f1 = f1_score(y_test, y_pred)
+auc = roc_auc_score(y_test, y_pred)
+
+# Calculate computational time
+end_time = time.time()
+computational_time = end_time - start_time
+
+# Create a new row as a DataFrame to append
+new_row = pd.DataFrame([{
+    'Model': 'Logistic Regression with All Variables (Mode)',
+    'Accuracy': accuracy,
+    'Precision': precision,
+    'Recall': recall,
+    'F1-score': f1,
+    'ROC AUC Score': auc,
+    'Computational Time': computational_time
+}])
+
+# Append the new row using pd.concat
+results_weather_mode = pd.concat([results_weather_mode, new_row], ignore_index=True)
+
+results_weather_mode
+```
+
+### LOGISTIC REGRESSION WITH SCALED DATA (MODE)
+```{python}
+#| label: logistic regression with scaled data (mode)
+
+# Start timing
+start_time = time.time()
+
+# Fit the model on the training data
+log_model.fit(X_train_scaled_weather, y_train)
+
+# Make predictions on the test data
+y_pred = log_model.predict(X_test_scaled_weather)
+
+# Calculate performance metrics
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+f1 = f1_score(y_test, y_pred)
+auc = roc_auc_score(y_test, y_pred)
+
+# Calculate computational time
+end_time = time.time()
+computational_time = end_time - start_time
+
+# Create a new row as a DataFrame to append
+new_row = pd.DataFrame([{
+    'Model': 'Logistic Regression with Scaled Data (Mode)',
+    'Accuracy': accuracy,
+    'Precision': precision,
+    'Recall': recall,
+    'F1-score': f1,
+    'ROC AUC Score': auc,
+    'Computational Time': computational_time
+}])
+
+# Append the new row using pd.concat
+results_weather_mode = pd.concat([results_weather_mode, new_row], ignore_index=True)
+
+results_weather_mode
+```
+
+
+### DECISION TREE WITH ALL VARIABLES (MODE)
+```{python}
+#| label: decision tree with all variables (mode)
+
+# Start timing
+start_time = time.time()
+
+# Initialize Decision Tree model
+dt_clf = DecisionTreeClassifier()
+
+# Fit the model on the training data
+dt_clf.fit(X_train, y_train)
+
+# Make predictions on the testing data
+y_pred = dt_clf.predict(X_test)
+
+# Calculate performance metrics
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+f1 = f1_score(y_test, y_pred)
+auc = roc_auc_score(y_test, y_pred)
+
+# Calculate computational time
+end_time = time.time()
+computational_time = end_time - start_time
+
+# Create a new row as a DataFrame to append
+new_row = pd.DataFrame([{
+    'Model': 'Decision Tree with All Variables (Mode)',
+    'Accuracy': accuracy,
+    'Precision': precision,
+    'Recall': recall,
+    'F1-score': f1,
+    'ROC AUC Score': auc,
+    'Computational Time': computational_time
+}])
+
+# Append the new row using pd.concat
+results_weather_mode = pd.concat([results_weather_mode, new_row], ignore_index=True)
+
+results_weather_mode
+```
+
+
+### DECISION TREE WITH SCALED DATA (MODE)
+```{python}
+#| label: decision tree with scaled data (mode)
+
+# Start timing
+start_time = time.time()
+
+# Fit the model on the training data
+dt_clf.fit(X_train_scaled_weather, y_train)
+
+# Make predictions on the test data
+y_pred = dt_clf.predict(X_test_scaled_weather)
+
+# Calculate performance metrics
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+f1 = f1_score(y_test, y_pred)
+auc = roc_auc_score(y_test, y_pred)
+
+# Calculate computational time
+end_time = time.time()
+computational_time = end_time - start_time
+
+# Create a new row as a DataFrame to append
+new_row = pd.DataFrame([{
+    'Model': 'Decision Tree with Scaled Data (Mode)',
+    'Accuracy': accuracy,
+    'Precision': precision,
+    'Recall': recall,
+    'F1-score': f1,
+    'ROC AUC Score': auc,
+    'Computational Time': computational_time
+}])
+
+# Append the new row using pd.concat
+results_weather_mode = pd.concat([results_weather_mode, new_row], ignore_index=True)
+
+results_weather_mode
+```
+
+
+### RANDOM FOREST WITH ALL VARIABLES (MODE)
+```{python}
+#| label: random forest with all variables (mode)
+
+# Start timing
+start_time = time.time()
+
+# Initialize Random Forest model
+model_rf = RandomForestClassifier()
+
+# Fit the model on the training data
+model_rf.fit(X_train, y_train)
+
+# Make predictions on the testing data
+y_pred = model_rf.predict(X_test)
+
+# Calculate performance metrics
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+f1 = f1_score(y_test, y_pred)
+auc = roc_auc_score(y_test, y_pred)
+
+# Calculate computational time
+end_time = time.time()
+computational_time = end_time - start_time
+
+# Create a new row as a DataFrame to append
+new_row = pd.DataFrame([{
+    'Model': 'Random Forest with All Variables (Mode)',
+    'Accuracy': accuracy,
+    'Precision': precision,
+    'Recall': recall,
+    'F1-score': f1,
+    'ROC AUC Score': auc,
+    'Computational Time': computational_time
+}])
+
+# Append the new row using pd.concat
+results_weather_mode = pd.concat([results_weather_mode, new_row], ignore_index=True)
+
+results_weather_mode
+```
+
+
+### RANDOM FOREST WITH SCALED DATA (MODE)
+
+```{python}
+#| label: random forest with scaled data (mode)
+
+# Start timing
+start_time = time.time()
+
+# Fit the model on the training data
+model_rf.fit(X_train_scaled_weather, y_train)
+
+# Make predictions on the test data
+y_pred = model_rf.predict(X_test_scaled_weather)
+
+# Calculate performance metrics
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+f1 = f1_score(y_test, y_pred)
+auc = roc_auc_score(y_test, y_pred)
+
+# Calculate computational time
+end_time = time.time()
+computational_time = end_time - start_time
+
+# Create a new row as a DataFrame to append
+new_row = pd.DataFrame([{
+    'Model': 'Random Forest with Scaled Data (Mode)',
+    'Accuracy': accuracy,
+    'Precision': precision,
+    'Recall': recall,
+    'F1-score': f1,
+    'ROC AUC Score': auc,
+    'Computational Time': computational_time
+}])
+
+# Append the new row using pd.concat
+results_weather_mode = pd.concat([results_weather_mode, new_row], ignore_index=True)
+
+results_weather_mode
+```
+
+
+### GRADIENT BOOSTING WITH ALL VARIABLES (MODE)
+```{python}
+#| label: gradient boosting with all variables (mode)
+
+# Start timing
+start_time = time.time()
+
+# Initialize Gradient Boosting model
+gb_classifier = GradientBoostingClassifier()
+
+# Fit the model on the training data
+gb_classifier.fit(X_train, y_train)
+
+# Make predictions on the testing data
+y_pred = gb_classifier.predict(X_test)
+
+# Calculate performance metrics
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+f1 = f1_score(y_test, y_pred)
+auc = roc_auc_score(y_test, y_pred)
+
+# Calculate computational time
+end_time = time.time()
+computational_time = end_time - start_time
+
+# Create a new row as a DataFrame to append
+new_row = pd.DataFrame([{
+    'Model': 'Gradient Boosting with All Variables (Mode)',
+    'Accuracy': accuracy,
+    'Precision': precision,
+    'Recall': recall,
+    'F1-score': f1,
+    'ROC AUC Score': auc,
+    'Computational Time': computational_time
+}])
+
+# Append the new row using pd.concat
+results_weather_mode = pd.concat([results_weather_mode, new_row], ignore_index=True)
+
+results_weather_mode
+```
+
+### GRADIENT BOOSTING WITH SCALED DATA (MODE)
+```{python}
+#| label: gradient boosting with scaled data (mode)
+
+# Start timing
+start_time = time.time()
+
+# Fit the model on the training data
+gb_classifier.fit(X_train_scaled_weather, y_train)
+
+# Make predictions on the test data
+y_pred = gb_classifier.predict(X_test_scaled_weather)
+
+# Calculate performance metrics
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+f1 = f1_score(y_test, y_pred)
+auc = roc_auc_score(y_test, y_pred)
+
+# Calculate computational time
+end_time = time.time()
+computational_time = end_time - start_time
+
+# Create a new row as a DataFrame to append
+new_row = pd.DataFrame([{
+    'Model': 'Gradient Boosting with Scaled Data (Mode)',
+    'Accuracy': accuracy,
+    'Precision': precision,
+    'Recall': recall,
+    'F1-score': f1,
+    'ROC AUC Score': auc,
+    'Computational Time': computational_time
+}])
+
+# Append the new row using pd.concat
+results_weather_mode = pd.concat([results_weather_mode, new_row], ignore_index=True)
+
+results_weather_mode
+```
+
+
+### KNEIGHBORS WITH ALL VARIABLES (MODE)
+```{python}
+#| label: KNeighbors with all variables (mode)
+
+# Start timing
+start_time = time.time()
+
+# Initialize Logistic Regression model
+knn_classifier = KNeighborsClassifier()
+
+# Fit the model on the training data
+knn_classifier.fit(X_train, y_train)
+
+# Make predictions on the testing data
+y_pred = knn_classifier.predict(X_test)
+
+# Calculate performance metrics
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+f1 = f1_score(y_test, y_pred)
+auc = roc_auc_score(y_test, y_pred)
+
+# Calculate computational time
+end_time = time.time()
+computational_time = end_time - start_time
+
+# Create a new row as a DataFrame to append
+new_row = pd.DataFrame([{
+    'Model': 'KNeighbors with All Variables (Mode)',
+    'Accuracy': accuracy,
+    'Precision': precision,
+    'Recall': recall,
+    'F1-score': f1,
+    'ROC AUC Score': auc,
+    'Computational Time': computational_time
+}])
+
+# Append the new row using pd.concat
+results_weather_mode = pd.concat([results_weather_mode, new_row], ignore_index=True)
+
+results_weather_mode
+```
+
+### KNEIGHBORS WITH SCALED DATA (MODE)
+```{python}
+#| label: KNeighbors with scaled data (mode)
+
+# Start timing
+start_time = time.time()
+
+# Fit the model on the training data
+knn_classifier.fit(X_train_scaled_weather, y_train)
+
+# Make predictions on the test data
+y_pred = knn_classifier.predict(X_test_scaled_weather)
+
+# Calculate performance metrics
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+f1 = f1_score(y_test, y_pred)
+auc = roc_auc_score(y_test, y_pred)
+
+# Calculate computational time
+end_time = time.time()
+computational_time = end_time - start_time
+
+# Create a new row as a DataFrame to append
+new_row = pd.DataFrame([{
+    'Model': 'KNeighbors with Scaled Data (Mode)',
+    'Accuracy': accuracy,
+    'Precision': precision,
+    'Recall': recall,
+    'F1-score': f1,
+    'ROC AUC Score': auc,
+    'Computational Time': computational_time
+}])
+
+# Append the new row using pd.concat
+results_weather_mode = pd.concat([results_weather_mode, new_row], ignore_index=True)
+
+results_weather_mode
+```
+
+
+### ADABOOST WITH ALL VARIABLES (MODE)
+```{python}
+#| label: AdaBoost with all variables (mode)
+
+# Start timing
+start_time = time.time()
+
+# Initialize Adaboost model
+adaboost_classifier = AdaBoostClassifier()
+
+# Fit the model on the training data
+adaboost_classifier.fit(X_train, y_train)
+
+# Make predictions on the testing data
+y_pred = adaboost_classifier.predict(X_test)
+
+# Calculate performance metrics
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+f1 = f1_score(y_test, y_pred)
+auc = roc_auc_score(y_test, y_pred)
+
+# Calculate computational time
+end_time = time.time()
+computational_time = end_time - start_time
+
+# Create a new row as a DataFrame to append
+new_row = pd.DataFrame([{
+    'Model': 'AdaBoost with All Variables (Mode)',
+    'Accuracy': accuracy,
+    'Precision': precision,
+    'Recall': recall,
+    'F1-score': f1,
+    'ROC AUC Score': auc,
+    'Computational Time': computational_time
+}])
+
+# Append the new row using pd.concat
+results_weather_mode = pd.concat([results_weather_mode, new_row], ignore_index=True)
+
+results_weather_mode
+```
+
+### ADABOOST WITH SCALED DATA (MODE)
+```{python}
+#| label: AdaBoost with scaled data (mode)
+
+# Start timing
+start_time = time.time()
+
+# Fit the model on the training data
+adaboost_classifier.fit(X_train_scaled_weather, y_train)
+
+# Make predictions on the test data
+y_pred = adaboost_classifier.predict(X_test_scaled_weather)
+
+# Calculate performance metrics
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+f1 = f1_score(y_test, y_pred)
+auc = roc_auc_score(y_test, y_pred)
+
+# Calculate computational time
+end_time = time.time()
+computational_time = end_time - start_time
+
+# Create a new row as a DataFrame to append
+new_row = pd.DataFrame([{
+    'Model': 'AdaBoost with Scaled Data (Mode)',
+    'Accuracy': accuracy,
+    'Precision': precision,
+    'Recall': recall,
+    'F1-score': f1,
+    'ROC AUC Score': auc,
+    'Computational Time': computational_time
+}])
+
+# Append the new row using pd.concat
+results_weather_mode = pd.concat([results_weather_mode, new_row], ignore_index=True)
+
+results_weather_mode
+```
+
+
+## SHOWING THE MODEL PERFORMANCE WITH MODE
+```{python}
+#| label: show the model performance with MODE
+
+results_weather_mode
+```
+
 # MICE IMPUTATION TECHNIQUE
 
 This technique fills missing values with the median of the non-missing values in the dataset.
@@ -1163,6 +1744,596 @@ results_weather_mice
 results_weather_mice
 ```
 
+# KNN IMPUTATION TECHNIQUE
+## VISUALIZING THE NUMBER OF MISSING VALUES IN THE DATA SET
+
+```{python}
+# Checking for missing values
+print("\nMissing values in each column:")
+print(weather.isnull().sum())
+
+# Visualizing missing data pattern
+plt.figure(figsize=(12, 8))
+sns.heatmap(weather.isnull(), cmap='viridis', cbar=False)
+plt.title('Missing Data Pattern')
+plt.show()
+```
+
+## FILLING MISSING VALUES BY KNN
+```{python}
+#| label: filling missing values with KNN
+
+# Instantiate the KNNImputer
+imputer = KNNImputer(n_neighbors=5, weights='uniform', metric='nan_euclidean')
+
+# Fit the imputer to your data and transform it
+weather_filled_knn = imputer.fit_transform(weather)
+
+# Convert the array back to a DataFrame if necessary
+weather_filled_knn = pd.DataFrame(weather_filled_knn, columns=weather.columns)
+
+# Checking for missing values
+print("\nMissing values in each column:")
+print(weather_filled_knn.isnull().sum())
+
+# Visualizing missing data pattern
+plt.figure(figsize=(12, 8))
+sns.heatmap(weather_filled_knn.isnull(), cmap='viridis', cbar=False)
+plt.title('Missing Data Pattern')
+plt.show()
+```
+
+## PREPROCESSING STEPS BEFORE MODELLING
+### SPLITTING THE DATA
+```{python}
+#| label: spliting the data (KNN)
+
+X = weather_filled_knn.drop(columns = ['RainTomorrow'])
+y = weather_filled_knn['RainTomorrow']
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Initialize the StandardScaler
+scaler = StandardScaler()
+
+# Fit and transform the training and testing data separately
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.fit_transform(X_test)
+
+# Convert scaled data back to DataFrames
+X_train_scaled_weather = pd.DataFrame(X_train_scaled, columns=X.columns)
+X_test_scaled_weather = pd.DataFrame(X_test_scaled, columns=X.columns)
+```
+
+
+## MODELING WITH KNN
+### LOGISTIC REGRESSION WITH ALL VARIABLES (KNN)
+```{python}
+#| label: logistic regression with all variables (KNN)
+
+# Creatin a performance scores dataframe
+results_weather_knn = pd.DataFrame(columns=['Model', 'Accuracy', 'Precision', 'Recall', 'F1-score', 'ROC AUC Score', 'Computational Time'])
+
+# Start timing
+start_time = time.time()
+
+# Initialize Logistic Regression model
+log_model = LogisticRegression()
+
+# Fit the model on the training data
+log_model.fit(X_train, y_train)
+
+# Make predictions on the testing data
+y_pred = log_model.predict(X_test)
+
+# Calculate performance metrics
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+f1 = f1_score(y_test, y_pred)
+auc = roc_auc_score(y_test, y_pred)
+
+# Calculate computational time
+end_time = time.time()
+computational_time = end_time - start_time
+
+# Create a new row as a DataFrame to append
+new_row = pd.DataFrame([{
+    'Model': 'Logistic Regression with All Variables (KNN)',
+    'Accuracy': accuracy,
+    'Precision': precision,
+    'Recall': recall,
+    'F1-score': f1,
+    'ROC AUC Score': auc,
+    'Computational Time': computational_time
+}])
+
+# Append the new row using pd.concat
+results_weather_knn = pd.concat([results_weather_knn, new_row], ignore_index=True)
+
+results_weather_knn
+```
+
+### LOGISTIC REGRESSION WITH SCALED DATA (KNN)
+```{python}
+#| label: logistic regression with scaled data (KNN)
+
+# Start timing
+start_time = time.time()
+
+# Fit the model on the training data
+log_model.fit(X_train_scaled_weather, y_train)
+
+# Make predictions on the test data
+y_pred = log_model.predict(X_test_scaled_weather)
+
+# Calculate performance metrics
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+f1 = f1_score(y_test, y_pred)
+auc = roc_auc_score(y_test, y_pred)
+
+# Calculate computational time
+end_time = time.time()
+computational_time = end_time - start_time
+
+# Create a new row as a DataFrame to append
+new_row = pd.DataFrame([{
+    'Model': 'Logistic Regression with Scaled Data (KNN)',
+    'Accuracy': accuracy,
+    'Precision': precision,
+    'Recall': recall,
+    'F1-score': f1,
+    'ROC AUC Score': auc,
+    'Computational Time': computational_time
+}])
+
+# Append the new row using pd.concat
+results_weather_knn = pd.concat([results_weather_knn, new_row], ignore_index=True)
+
+results_weather_knn
+```
+
+
+### DECISION TREE WITH ALL VARIABLES (KNN)
+```{python}
+#| label: decision tree with all variables (KNN)
+
+# Start timing
+start_time = time.time()
+
+# Initialize Decision Tree model
+dt_clf = DecisionTreeClassifier()
+
+# Fit the model on the training data
+dt_clf.fit(X_train, y_train)
+
+# Make predictions on the testing data
+y_pred = dt_clf.predict(X_test)
+
+# Calculate performance metrics
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+f1 = f1_score(y_test, y_pred)
+auc = roc_auc_score(y_test, y_pred)
+
+# Calculate computational time
+end_time = time.time()
+computational_time = end_time - start_time
+
+# Create a new row as a DataFrame to append
+new_row = pd.DataFrame([{
+    'Model': 'Decision Tree with All Variables (KNN)',
+    'Accuracy': accuracy,
+    'Precision': precision,
+    'Recall': recall,
+    'F1-score': f1,
+    'ROC AUC Score': auc,
+    'Computational Time': computational_time
+}])
+
+# Append the new row using pd.concat
+results_weather_knn = pd.concat([results_weather_knn, new_row], ignore_index=True)
+
+results_weather_knn
+```
+
+### DECISION TREE WITH SCALED DATA (KNN)
+```{python}
+#| label: decision tree with scaled data (KNN)
+
+# Start timing
+start_time = time.time()
+
+# Fit the model on the training data
+dt_clf.fit(X_train_scaled_weather, y_train)
+
+# Make predictions on the test data
+y_pred = dt_clf.predict(X_test_scaled_weather)
+
+# Calculate performance metrics
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+f1 = f1_score(y_test, y_pred)
+auc = roc_auc_score(y_test, y_pred)
+
+# Calculate computational time
+end_time = time.time()
+computational_time = end_time - start_time
+
+# Create a new row as a DataFrame to append
+new_row = pd.DataFrame([{
+    'Model': 'Decision Tree with Scaled Data (KNN)',
+    'Accuracy': accuracy,
+    'Precision': precision,
+    'Recall': recall,
+    'F1-score': f1,
+    'ROC AUC Score': auc,
+    'Computational Time': computational_time
+}])
+
+# Append the new row using pd.concat
+results_weather_knn = pd.concat([results_weather_knn, new_row], ignore_index=True)
+
+results_weather_knn
+```
+
+
+### RANDOM FOREST WITH ALL VARIABLES (KNN)
+```{python}
+#| label: random forest with all variables (KNN)
+
+# Start timing
+start_time = time.time()
+
+# Initialize Random Forest model
+model_rf = RandomForestClassifier()
+
+# Fit the model on the training data
+model_rf.fit(X_train, y_train)
+
+# Make predictions on the testing data
+y_pred = model_rf.predict(X_test)
+
+# Calculate performance metrics
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+f1 = f1_score(y_test, y_pred)
+auc = roc_auc_score(y_test, y_pred)
+
+# Calculate computational time
+end_time = time.time()
+computational_time = end_time - start_time
+
+# Create a new row as a DataFrame to append
+new_row = pd.DataFrame([{
+    'Model': 'Random Forest with All Variables (KNN)',
+    'Accuracy': accuracy,
+    'Precision': precision,
+    'Recall': recall,
+    'F1-score': f1,
+    'ROC AUC Score': auc,
+    'Computational Time': computational_time
+}])
+
+# Append the new row using pd.concat
+results_weather_knn = pd.concat([results_weather_knn, new_row], ignore_index=True)
+
+results_weather_knn
+```
+
+### RANDOM FOREST WITH SCALED DATA (KNN)
+```{python}
+#| label: random forest with scaled data (KNN)
+
+# Start timing
+start_time = time.time()
+
+# Fit the model on the training data
+model_rf.fit(X_train_scaled_weather, y_train)
+
+# Make predictions on the test data
+y_pred = model_rf.predict(X_test_scaled_weather)
+
+# Calculate performance metrics
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+f1 = f1_score(y_test, y_pred)
+auc = roc_auc_score(y_test, y_pred)
+
+# Calculate computational time
+end_time = time.time()
+computational_time = end_time - start_time
+
+# Create a new row as a DataFrame to append
+new_row = pd.DataFrame([{
+    'Model': 'Random Forest with Scaled Data (KNN)',
+    'Accuracy': accuracy,
+    'Precision': precision,
+    'Recall': recall,
+    'F1-score': f1,
+    'ROC AUC Score': auc,
+    'Computational Time': computational_time
+}])
+
+# Append the new row using pd.concat
+results_weather_knn = pd.concat([results_weather_knn, new_row], ignore_index=True)
+
+results_weather_knn
+```
+
+
+### GRADIENT BOOSTING WITH ALL VARIABLES (KNN)
+```{python}
+#| label: gradient boosting with all variables (KNN)
+
+# Start timing
+start_time = time.time()
+
+# Initialize Gradient Boosting model
+gb_classifier = GradientBoostingClassifier()
+
+# Fit the model on the training data
+gb_classifier.fit(X_train, y_train)
+
+# Make predictions on the testing data
+y_pred = gb_classifier.predict(X_test)
+
+# Calculate performance metrics
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+f1 = f1_score(y_test, y_pred)
+auc = roc_auc_score(y_test, y_pred)
+
+# Calculate computational time
+end_time = time.time()
+computational_time = end_time - start_time
+
+# Create a new row as a DataFrame to append
+new_row = pd.DataFrame([{
+    'Model': 'Gradient Boosting with All Variables (KNN)',
+    'Accuracy': accuracy,
+    'Precision': precision,
+    'Recall': recall,
+    'F1-score': f1,
+    'ROC AUC Score': auc,
+    'Computational Time': computational_time
+}])
+
+# Append the new row using pd.concat
+results_weather_knn = pd.concat([results_weather_knn, new_row], ignore_index=True)
+
+results_weather_knn
+```
+
+### GRADIENT BOOSTING WITH SCALED DATA (KNN)
+```{python}
+#| label: gradient boosting with scaled data (KNN)
+
+# Start timing
+start_time = time.time()
+
+# Fit the model on the training data
+gb_classifier.fit(X_train_scaled_weather, y_train)
+
+# Make predictions on the test data
+y_pred = gb_classifier.predict(X_test_scaled_weather)
+
+# Calculate performance metrics
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+f1 = f1_score(y_test, y_pred)
+auc = roc_auc_score(y_test, y_pred)
+
+# Calculate computational time
+end_time = time.time()
+computational_time = end_time - start_time
+
+# Create a new row as a DataFrame to append
+new_row = pd.DataFrame([{
+    'Model': 'Gradient Boosting with Scaled Data (KNN)',
+    'Accuracy': accuracy,
+    'Precision': precision,
+    'Recall': recall,
+    'F1-score': f1,
+    'ROC AUC Score': auc,
+    'Computational Time': computational_time
+}])
+
+# Append the new row using pd.concat
+results_weather_knn = pd.concat([results_weather_knn, new_row], ignore_index=True)
+
+results_weather_knn
+```
+
+
+### KNEIGHBORS WITH ALL VARIABLES (KNN)
+```{python}
+#| label: KNeighbors with all variables (KNN)
+
+# Start timing
+start_time = time.time()
+
+# Initialize Logistic Regression model
+knn_classifier = KNeighborsClassifier()
+
+# Fit the model on the training data
+knn_classifier.fit(X_train, y_train)
+
+# Make predictions on the testing data
+y_pred = knn_classifier.predict(X_test)
+
+# Calculate performance metrics
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+f1 = f1_score(y_test, y_pred)
+auc = roc_auc_score(y_test, y_pred)
+
+# Calculate computational time
+end_time = time.time()
+computational_time = end_time - start_time
+
+# Create a new row as a DataFrame to append
+new_row = pd.DataFrame([{
+    'Model': 'KNeighbors with All Variables (KNN)',
+    'Accuracy': accuracy,
+    'Precision': precision,
+    'Recall': recall,
+    'F1-score': f1,
+    'ROC AUC Score': auc,
+    'Computational Time': computational_time
+}])
+
+# Append the new row using pd.concat
+results_weather_knn = pd.concat([results_weather_knn, new_row], ignore_index=True)
+
+results_weather_knn
+```
+
+### KNEIGHBORS WITH SCALED DATA (KNN)
+```{python}
+#| label: KNeighbors with scaled data (KNN)
+
+# Start timing
+start_time = time.time()
+
+# Fit the model on the training data
+knn_classifier.fit(X_train_scaled_weather, y_train)
+
+# Make predictions on the test data
+y_pred = knn_classifier.predict(X_test_scaled_weather)
+
+# Calculate performance metrics
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+f1 = f1_score(y_test, y_pred)
+auc = roc_auc_score(y_test, y_pred)
+
+# Calculate computational time
+end_time = time.time()
+computational_time = end_time - start_time
+
+# Create a new row as a DataFrame to append
+new_row = pd.DataFrame([{
+    'Model': 'KNeighbors with Scaled Data (KNN)',
+    'Accuracy': accuracy,
+    'Precision': precision,
+    'Recall': recall,
+    'F1-score': f1,
+    'ROC AUC Score': auc,
+    'Computational Time': computational_time
+}])
+
+# Append the new row using pd.concat
+results_weather_knn = pd.concat([results_weather_knn, new_row], ignore_index=True)
+
+results_weather_knn
+```
+
+
+### ADABOOST WITH ALL VARIABLES (KNN)
+```{python}
+#| label: AdaBoost with all variables (KNN)
+
+# Start timing
+start_time = time.time()
+
+# Initialize Logistic Regression model
+adaboost_classifier = AdaBoostClassifier()
+
+# Fit the model on the training data
+adaboost_classifier.fit(X_train, y_train)
+
+# Make predictions on the testing data
+y_pred = adaboost_classifier.predict(X_test)
+
+# Calculate performance metrics
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+f1 = f1_score(y_test, y_pred)
+auc = roc_auc_score(y_test, y_pred)
+
+# Calculate computational time
+end_time = time.time()
+computational_time = end_time - start_time
+
+# Create a new row as a DataFrame to append
+new_row = pd.DataFrame([{
+    'Model': 'AdaBoost with All Variables (KNN)',
+    'Accuracy': accuracy,
+    'Precision': precision,
+    'Recall': recall,
+    'F1-score': f1,
+    'ROC AUC Score': auc,
+    'Computational Time': computational_time
+}])
+
+# Append the new row using pd.concat
+results_weather_knn = pd.concat([results_weather_knn, new_row], ignore_index=True)
+
+results_weather_knn
+```
+
+### ADABOOST WITH SCALED DATA (KNN)
+```{python}
+#| label: AdaBoost with scaled data (KNN)
+
+# Start timing
+start_time = time.time()
+
+# Fit the model on the training data
+adaboost_classifier.fit(X_train_scaled_weather, y_train)
+
+# Make predictions on the test data
+y_pred = adaboost_classifier.predict(X_test_scaled_weather)
+
+# Calculate performance metrics
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+f1 = f1_score(y_test, y_pred)
+auc = roc_auc_score(y_test, y_pred)
+
+# Calculate computational time
+end_time = time.time()
+computational_time = end_time - start_time
+
+# Create a new row as a DataFrame to append
+new_row = pd.DataFrame([{
+    'Model': 'AdaBoost with Scaled Data (KNN)',
+    'Accuracy': accuracy,
+    'Precision': precision,
+    'Recall': recall,
+    'F1-score': f1,
+    'ROC AUC Score': auc,
+    'Computational Time': computational_time
+}])
+
+# Append the new row using pd.concat
+results_weather_knn = pd.concat([results_weather_knn, new_row], ignore_index=True)
+
+results_weather_knn
+```
+
+
+## SHOWING THE MODEL PERFORMANCE WITH KNN
+```{python}
+#| label: show the model performance with KNN
+
+results_weather_knn
+```
+
+
 # REGRESSION IMPUTATION TECHNIQUE
 
 This technique fills missing values by predicting them using regression models based on the observed values of other variables.
@@ -1672,4 +2843,594 @@ weather_filled_regression
 ## SHOWING THE MODEL PERFORMANCE
 ```{python}
 weather_filled_regression
+```
+
+# INTERPOLATION IMPUTATION TECHNIQUE
+## VISUALIZING THE NUMBER OF MISSING VALUES IN THE DATA SET
+
+```{python}
+# Checking for missing values
+print("\nMissing values in each column:")
+print(weather.isnull().sum())
+
+# Visualizing missing data pattern
+plt.figure(figsize=(12, 8))
+sns.heatmap(weather.isnull(), cmap='viridis', cbar=False)
+plt.title('Missing Data Pattern')
+plt.show()
+```
+
+## FILLING MISSING VALUES BY INTERPOLATION
+```{python}
+#| label: filling missing values with interpolation
+
+# Apply linear interpolation for numerical columns
+numeric_columns = weather.select_dtypes(include=['float64', 'int64']).columns
+weather[numeric_columns] = weather[numeric_columns].interpolate(method='linear')
+
+# Fit the imputer to your data and transform it
+weather_filled_interpolation = imputer.fit_transform(weather)
+
+# Convert the array back to a DataFrame if necessary
+weather_filled_interpolation = pd.DataFrame(weather_filled_interpolation, columns=weather.columns)
+
+# Checking for missing values
+print("\nMissing values in each column:")
+print(weather_filled_interpolation.isnull().sum())
+
+# Visualizing missing data pattern
+plt.figure(figsize=(12, 8))
+sns.heatmap(weather_filled_interpolation.isnull(), cmap='viridis', cbar=False)
+plt.title('Missing Data Pattern')
+plt.show()
+```
+
+## PREPROCESSING STEPS BEFORE MODELLING
+### SPLITTING THE DATA
+```{python}
+#| label: spliting the data (interpolation)
+
+X = weather_filled_interpolation.drop(columns = ['RainTomorrow'])
+y = weather_filled_interpolation['RainTomorrow']
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Initialize the StandardScaler
+scaler = StandardScaler()
+
+# Fit and transform the training and testing data separately
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.fit_transform(X_test)
+
+# Convert scaled data back to DataFrames
+X_train_scaled_weather = pd.DataFrame(X_train_scaled, columns=X.columns)
+X_test_scaled_weather = pd.DataFrame(X_test_scaled, columns=X.columns)
+```
+
+
+## MODELING WITH INTERPOLATION
+### LOGISTIC REGRESSION WITH ALL VARIABLES (INTERPOLATION)
+```{python}
+#| label: logistic regression with all variables (interpolation)
+
+# Creatin a performance scores dataframe
+results_weather_interpolation = pd.DataFrame(columns=['Model', 'Accuracy', 'Precision', 'Recall', 'F1-score', 'ROC AUC Score', 'Computational Time'])
+
+# Start timing
+start_time = time.time()
+
+# Initialize Logistic Regression model
+log_model = LogisticRegression()
+
+# Fit the model on the training data
+log_model.fit(X_train, y_train)
+
+# Make predictions on the testing data
+y_pred = log_model.predict(X_test)
+
+# Calculate performance metrics
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+f1 = f1_score(y_test, y_pred)
+auc = roc_auc_score(y_test, y_pred)
+
+# Calculate computational time
+end_time = time.time()
+computational_time = end_time - start_time
+
+# Create a new row as a DataFrame to append
+new_row = pd.DataFrame([{
+    'Model': 'Logistic Regression with All Variables (Interpolation)',
+    'Accuracy': accuracy,
+    'Precision': precision,
+    'Recall': recall,
+    'F1-score': f1,
+    'ROC AUC Score': auc,
+    'Computational Time': computational_time
+}])
+
+# Append the new row using pd.concat
+results_weather_interpolation = pd.concat([results_weather_interpolation, new_row], ignore_index=True)
+
+results_weather_interpolation
+```
+
+### LOGISTIC REGRESSION WITH SCALED DATA (INTERPOLATION)
+```{python}
+#| label: logistic regression with scaled data (INTERPOLATION)
+
+# Start timing
+start_time = time.time()
+
+# Fit the model on the training data
+log_model.fit(X_train_scaled_weather, y_train)
+
+# Make predictions on the test data
+y_pred = log_model.predict(X_test_scaled_weather)
+
+# Calculate performance metrics
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+f1 = f1_score(y_test, y_pred)
+auc = roc_auc_score(y_test, y_pred)
+
+# Calculate computational time
+end_time = time.time()
+computational_time = end_time - start_time
+
+# Create a new row as a DataFrame to append
+new_row = pd.DataFrame([{
+    'Model': 'Logistic Regression with Scaled Data (Interpolation)',
+    'Accuracy': accuracy,
+    'Precision': precision,
+    'Recall': recall,
+    'F1-score': f1,
+    'ROC AUC Score': auc,
+    'Computational Time': computational_time
+}])
+
+# Append the new row using pd.concat
+results_weather_interpolation = pd.concat([results_weather_interpolation, new_row], ignore_index=True)
+
+results_weather_interpolation
+```
+
+
+### DECISION TREE WITH ALL VARIABLES (INTERPOLATION)
+```{python}
+#| label: decision tree with all variables (INTERPOLATION)
+
+# Start timing
+start_time = time.time()
+
+# Initialize Decision Tree model
+dt_clf = DecisionTreeClassifier()
+
+# Fit the model on the training data
+dt_clf.fit(X_train, y_train)
+
+# Make predictions on the testing data
+y_pred = dt_clf.predict(X_test)
+
+# Calculate performance metrics
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+f1 = f1_score(y_test, y_pred)
+auc = roc_auc_score(y_test, y_pred)
+
+# Calculate computational time
+end_time = time.time()
+computational_time = end_time - start_time
+
+# Create a new row as a DataFrame to append
+new_row = pd.DataFrame([{
+    'Model': 'Decision Tree with All Variables (Interpolation)',
+    'Accuracy': accuracy,
+    'Precision': precision,
+    'Recall': recall,
+    'F1-score': f1,
+    'ROC AUC Score': auc,
+    'Computational Time': computational_time
+}])
+
+# Append the new row using pd.concat
+results_weather_interpolation = pd.concat([results_weather_interpolation, new_row], ignore_index=True)
+
+results_weather_interpolation
+```
+
+### DECISION TREE WITH SCALED DATA (INTERPOLATION)
+```{python}
+#| label: decision tree with scaled data (INTERPOLATION)
+
+# Start timing
+start_time = time.time()
+
+# Fit the model on the training data
+dt_clf.fit(X_train_scaled_weather, y_train)
+
+# Make predictions on the test data
+y_pred = dt_clf.predict(X_test_scaled_weather)
+
+# Calculate performance metrics
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+f1 = f1_score(y_test, y_pred)
+auc = roc_auc_score(y_test, y_pred)
+
+# Calculate computational time
+end_time = time.time()
+computational_time = end_time - start_time
+
+# Create a new row as a DataFrame to append
+new_row = pd.DataFrame([{
+    'Model': 'Decision Tree with Scaled Data (Interpolation)',
+    'Accuracy': accuracy,
+    'Precision': precision,
+    'Recall': recall,
+    'F1-score': f1,
+    'ROC AUC Score': auc,
+    'Computational Time': computational_time
+}])
+
+# Append the new row using pd.concat
+results_weather_interpolation = pd.concat([results_weather_interpolation, new_row], ignore_index=True)
+
+results_weather_interpolation
+```
+
+
+### RANDOM FOREST WITH ALL VARIABLES (INTERPOLATION)
+```{python}
+#| label: random forest with all variables (INTERPOLATION)
+
+# Start timing
+start_time = time.time()
+
+# Initialize Random Forest model
+model_rf = RandomForestClassifier()
+
+# Fit the model on the training data
+model_rf.fit(X_train, y_train)
+
+# Make predictions on the testing data
+y_pred = model_rf.predict(X_test)
+
+# Calculate performance metrics
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+f1 = f1_score(y_test, y_pred)
+auc = roc_auc_score(y_test, y_pred)
+
+# Calculate computational time
+end_time = time.time()
+computational_time = end_time - start_time
+
+# Create a new row as a DataFrame to append
+new_row = pd.DataFrame([{
+    'Model': 'Random Forest with All Variables (Interpolation)',
+    'Accuracy': accuracy,
+    'Precision': precision,
+    'Recall': recall,
+    'F1-score': f1,
+    'ROC AUC Score': auc,
+    'Computational Time': computational_time
+}])
+
+# Append the new row using pd.concat
+results_weather_interpolation = pd.concat([results_weather_interpolation, new_row], ignore_index=True)
+
+results_weather_interpolation
+```
+
+### RANDOM FOREST WITH SCALED DATA (INTERPOLATION)
+```{python}
+#| label: random forest with scaled data (INTERPOLATION)
+
+# Start timing
+start_time = time.time()
+
+# Fit the model on the training data
+model_rf.fit(X_train_scaled_weather, y_train)
+
+# Make predictions on the test data
+y_pred = model_rf.predict(X_test_scaled_weather)
+
+# Calculate performance metrics
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+f1 = f1_score(y_test, y_pred)
+auc = roc_auc_score(y_test, y_pred)
+
+# Calculate computational time
+end_time = time.time()
+computational_time = end_time - start_time
+
+# Create a new row as a DataFrame to append
+new_row = pd.DataFrame([{
+    'Model': 'Random Forest with Scaled Data (Interpolation)',
+    'Accuracy': accuracy,
+    'Precision': precision,
+    'Recall': recall,
+    'F1-score': f1,
+    'ROC AUC Score': auc,
+    'Computational Time': computational_time
+}])
+
+# Append the new row using pd.concat
+results_weather_interpolation = pd.concat([results_weather_interpolation, new_row], ignore_index=True)
+
+results_weather_interpolation
+```
+
+
+### GRADIENT BOOSTING WITH ALL VARIABLES (INTERPOLATION)
+```{python}
+#| label: gradient boosting with all variables (INTERPOLATION)
+
+# Start timing
+start_time = time.time()
+
+# Initialize Gradient Boosting model
+gb_classifier = GradientBoostingClassifier()
+
+# Fit the model on the training data
+gb_classifier.fit(X_train, y_train)
+
+# Make predictions on the testing data
+y_pred = gb_classifier.predict(X_test)
+
+# Calculate performance metrics
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+f1 = f1_score(y_test, y_pred)
+auc = roc_auc_score(y_test, y_pred)
+
+# Calculate computational time
+end_time = time.time()
+computational_time = end_time - start_time
+
+# Create a new row as a DataFrame to append
+new_row = pd.DataFrame([{
+    'Model': 'Gradient Boosting with All Variables (Interpolation)',
+    'Accuracy': accuracy,
+    'Precision': precision,
+    'Recall': recall,
+    'F1-score': f1,
+    'ROC AUC Score': auc,
+    'Computational Time': computational_time
+}])
+
+# Append the new row using pd.concat
+results_weather_interpolation = pd.concat([results_weather_interpolation, new_row], ignore_index=True)
+
+results_weather_interpolation
+```
+
+### GRADIENT BOOSTING WITH SCALED DATA (INTERPOLATION)
+```{python}
+#| label: gradient boosting with scaled data (INTERPOLATION)
+
+# Start timing
+start_time = time.time()
+
+# Fit the model on the training data
+gb_classifier.fit(X_train_scaled_weather, y_train)
+
+# Make predictions on the test data
+y_pred = gb_classifier.predict(X_test_scaled_weather)
+
+# Calculate performance metrics
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+f1 = f1_score(y_test, y_pred)
+auc = roc_auc_score(y_test, y_pred)
+
+# Calculate computational time
+end_time = time.time()
+computational_time = end_time - start_time
+
+# Create a new row as a DataFrame to append
+new_row = pd.DataFrame([{
+    'Model': 'Gradient Boosting with Scaled Data (Interpolation)',
+    'Accuracy': accuracy,
+    'Precision': precision,
+    'Recall': recall,
+    'F1-score': f1,
+    'ROC AUC Score': auc,
+    'Computational Time': computational_time
+}])
+
+# Append the new row using pd.concat
+results_weather_interpolation = pd.concat([results_weather_interpolation, new_row], ignore_index=True)
+
+results_weather_interpolation
+```
+
+
+### KNEIGHBORS WITH ALL VARIABLES (INTERPOLATION)
+```{python}
+#| label: KNeighbors with all variables (INTERPOLATION)
+
+# Start timing
+start_time = time.time()
+
+# Initialize Logistic Regression model
+knn_classifier = KNeighborsClassifier()
+
+# Fit the model on the training data
+knn_classifier.fit(X_train, y_train)
+
+# Make predictions on the testing data
+y_pred = knn_classifier.predict(X_test)
+
+# Calculate performance metrics
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+f1 = f1_score(y_test, y_pred)
+auc = roc_auc_score(y_test, y_pred)
+
+# Calculate computational time
+end_time = time.time()
+computational_time = end_time - start_time
+
+# Create a new row as a DataFrame to append
+new_row = pd.DataFrame([{
+    'Model': 'KNeighbors with All Variables (Interpolation)',
+    'Accuracy': accuracy,
+    'Precision': precision,
+    'Recall': recall,
+    'F1-score': f1,
+    'ROC AUC Score': auc,
+    'Computational Time': computational_time
+}])
+
+# Append the new row using pd.concat
+results_weather_interpolation = pd.concat([results_weather_interpolation, new_row], ignore_index=True)
+
+results_weather_interpolation
+```
+
+### KNEIGHBORS WITH SCALED DATA (INTERPOLATION)
+```{python}
+#| label: KNeighbors with scaled data (INTERPOLATION)
+
+# Start timing
+start_time = time.time()
+
+# Fit the model on the training data
+knn_classifier.fit(X_train_scaled_weather, y_train)
+
+# Make predictions on the test data
+y_pred = knn_classifier.predict(X_test_scaled_weather)
+
+# Calculate performance metrics
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+f1 = f1_score(y_test, y_pred)
+auc = roc_auc_score(y_test, y_pred)
+
+# Calculate computational time
+end_time = time.time()
+computational_time = end_time - start_time
+
+# Create a new row as a DataFrame to append
+new_row = pd.DataFrame([{
+    'Model': 'KNeighbors with Scaled Data (Interpolation)',
+    'Accuracy': accuracy,
+    'Precision': precision,
+    'Recall': recall,
+    'F1-score': f1,
+    'ROC AUC Score': auc,
+    'Computational Time': computational_time
+}])
+
+# Append the new row using pd.concat
+results_weather_interpolation = pd.concat([results_weather_interpolation, new_row], ignore_index=True)
+
+results_weather_interpolation
+```
+
+
+### ADABOOST WITH ALL VARIABLES (INTERPOLATION)
+```{python}
+#| label: AdaBoost with all variables (INTERPOLATION)
+
+# Start timing
+start_time = time.time()
+
+# Initialize Logistic Regression model
+adaboost_classifier = AdaBoostClassifier()
+
+# Fit the model on the training data
+adaboost_classifier.fit(X_train, y_train)
+
+# Make predictions on the testing data
+y_pred = adaboost_classifier.predict(X_test)
+
+# Calculate performance metrics
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+f1 = f1_score(y_test, y_pred)
+auc = roc_auc_score(y_test, y_pred)
+
+# Calculate computational time
+end_time = time.time()
+computational_time = end_time - start_time
+
+# Create a new row as a DataFrame to append
+new_row = pd.DataFrame([{
+    'Model': 'AdaBoost with All Variables (Interpolation)',
+    'Accuracy': accuracy,
+    'Precision': precision,
+    'Recall': recall,
+    'F1-score': f1,
+    'ROC AUC Score': auc,
+    'Computational Time': computational_time
+}])
+
+# Append the new row using pd.concat
+results_weather_interpolation = pd.concat([results_weather_interpolation, new_row], ignore_index=True)
+
+results_weather_interpolation
+```
+
+### ADABOOST WITH SCALED DATA (INTERPOLATION)
+```{python}
+#| label: AdaBoost with scaled data (INTERPOLATION)
+
+# Start timing
+start_time = time.time()
+
+# Fit the model on the training data
+adaboost_classifier.fit(X_train_scaled_weather, y_train)
+
+# Make predictions on the test data
+y_pred = adaboost_classifier.predict(X_test_scaled_weather)
+
+# Calculate performance metrics
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+f1 = f1_score(y_test, y_pred)
+auc = roc_auc_score(y_test, y_pred)
+
+# Calculate computational time
+end_time = time.time()
+computational_time = end_time - start_time
+
+# Create a new row as a DataFrame to append
+new_row = pd.DataFrame([{
+    'Model': 'AdaBoost with Scaled Data (Interpolation)',
+    'Accuracy': accuracy,
+    'Precision': precision,
+    'Recall': recall,
+    'F1-score': f1,
+    'ROC AUC Score': auc,
+    'Computational Time': computational_time
+}])
+
+# Append the new row using pd.concat
+results_weather_interpolation = pd.concat([results_weather_interpolation, new_row], ignore_index=True)
+
+results_weather_interpolation
+```
+
+
+## SHOWING THE MODEL PERFORMANCE WITH INTERPOLATION
+```{python}
+#| label: show the model performance with INTERPOLATION
+
+results_weather_interpolation
 ```
