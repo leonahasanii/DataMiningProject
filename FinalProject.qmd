@@ -1230,6 +1230,521 @@ results_weather_mode
 results_weather_mode
 ```
 
+## MEAN IMPUTATION TECHNIQUE
+## VISUALIZING THE NUMBER OF MISSING VALUES IN THE DATA SET
+
+```{python}
+# Checking for missing values
+print("\nMissing values in each column:")
+print(weather.isnull().sum())
+
+# Visualizing missing data pattern
+plt.figure(figsize=(12, 8))
+sns.heatmap(weather.isnull(), cmap='viridis', cbar=False)
+plt.title('Missing Data Pattern')
+plt.show()
+```
+
+## FILLING MISSING VALUES BY MEAN
+
+```{python}
+# Handling missing values using different imputation techniques
+# Example: Filling missing values with mean
+weather_filled_mean = weather.fillna(weather.mean())
+
+# Checking for missing values
+print("\nMissing values in each column:")
+print(weather_filled_mean.isnull().sum())
+
+# Visualizing missing data pattern
+plt.figure(figsize=(12, 8))
+sns.heatmap(weather_filled_mean.isnull(), cmap='viridis', cbar=False)
+plt.title('Missing Data Pattern')
+plt.show()
+```
+
+## PREPROCESSING STEPS BEFORE MODELLING
+
+### SPLITTING THE DATA
+
+```{python}
+X = weather_filled_mean.drop(columns = ['RainTomorrow'])
+y = weather_filled_mean['RainTomorrow']
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Initialize the StandardScaler
+scaler = StandardScaler()
+
+# Fit and transform the training and testing data separately
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.fit_transform(X_test)
+
+# Convert scaled data back to DataFrames
+X_train_scaled_weather = pd.DataFrame(X_train_scaled, columns=X.columns)
+X_test_scaled_weather = pd.DataFrame(X_test_scaled, columns=X.columns)
+```
+
+
+## MODELING WITH MEAN
+### LOGISTIC REGRESSION WITH ALL VARIABLES (MEAN)
+
+```{python}
+
+start_time = time.time()
+
+log_model = LogisticRegression()
+
+log_model.fit(X_train, y_train)
+
+# Make predictions on the test data
+y_pred = log_model.predict(X_test)
+
+# Calculate performance metrics
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+f1 = f1_score(y_test, y_pred)
+auc = roc_auc_score(y_test, y_pred)
+
+end_time = time.time()
+computational_time = end_time - start_time
+
+# Creatin a performance scores dataframe
+results_weather_mean = pd.DataFrame(columns=['Model', 'Accuracy', 'Precision', 'Recall', 'F1-score', 'ROC AUC Score', 'Computational Time'])
+
+# Append the metrics to the DataFrame
+results_weather_mean = results_weather_mean.append({
+    'Model': 'Logistic Regression Classifier Mean',
+    'Accuracy': accuracy,
+    'Precision': precision,
+    'Recall': recall,
+    'F1-score': f1,
+    'ROC AUC Score': auc,
+    'Computational Time': computational_time
+}, ignore_index=True)
+
+results_weather_mean
+```
+
+### LOGISTIC REGRESSION WITH SCALED DATA (MEAN)
+
+```{python}
+start_time = time.time()
+
+log_model.fit(X_train_scaled_weather, y_train)
+
+# Make predictions on the test data
+y_pred = log_model.predict(X_test_scaled_weather)
+
+# Calculate performance metrics
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+f1 = f1_score(y_test, y_pred)
+auc = roc_auc_score(y_test, y_pred)
+
+end_time = time.time()
+computational_time = end_time - start_time
+
+# Append the metrics to the DataFrame
+results_weather_mean = results_weather_mean.append({
+    'Model': 'Logistic Regression Classifier Scaled Mean',
+    'Accuracy': accuracy,
+    'Precision': precision,
+    'Recall': recall,
+    'F1-score': f1,
+    'ROC AUC Score': auc,
+    'Computational Time': computational_time
+}, ignore_index=True)
+
+results_weather_mean
+```
+
+
+
+### DECISION TREE WITH ALL VARIABLES (MEAN)
+
+```{python}
+
+start_time = time.time()
+
+# Create a Decision Tree Classifier
+dt_clf = DecisionTreeClassifier()
+
+# Fit the model to the training data
+dt_clf.fit(X_train, y_train)
+
+# Make predictions on the test data
+y_pred = dt_clf.predict(X_test)
+
+# Calculate performance metrics
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+f1 = f1_score(y_test, y_pred)
+auc = roc_auc_score(y_test, y_pred)
+
+end_time = time.time()
+computational_time = end_time - start_time
+
+# Append the metrics to the DataFrame
+results_weather_mean = results_weather_mean.append({
+    'Model': 'Decision Tree Classifier Mean',
+    'Accuracy': accuracy,
+    'Precision': precision,
+    'Recall': recall,
+    'F1-score': f1,
+    'ROC AUC Score': auc,
+    'Computational Time': computational_time
+}, ignore_index=True)
+
+results_weather_mean
+```
+
+### DECISION TREE WITH SCALED DATA (MEAN)
+```{python}
+start_time = time.time()
+
+# Fit the model to the training data
+dt_clf.fit(X_train_scaled_weather, y_train)
+
+# Make predictions on the test data
+y_pred = dt_clf.predict(X_test_scaled_weather)
+
+# Calculate performance metrics
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+f1 = f1_score(y_test, y_pred)
+auc = roc_auc_score(y_test, y_pred)
+
+end_time = time.time()
+computational_time = end_time - start_time 
+
+# Append the metrics to the DataFrame
+results_weather_mean = results_weather_mean.append({
+    'Model': 'Decision Tree Classifier Scaled Mean',
+    'Accuracy': accuracy,
+    'Precision': precision,
+    'Recall': recall,
+    'F1-score': f1,
+    'ROC AUC Score': auc,
+    'Computational Time': computational_time
+}, ignore_index=True)
+
+results_weather_mean
+```
+
+
+### RANDOM FOREST WITH ALL VARIABLES (MEAN)
+```{python}
+
+start_time = time.time()
+
+model_rf = RandomForestClassifier()
+model_rf.fit(X_train, y_train)
+
+# Make predictions on the test data
+y_pred = model_rf.predict(X_test)
+
+# Calculate performance metrics
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+f1 = f1_score(y_test, y_pred)
+auc = roc_auc_score(y_test, y_pred)
+
+end_time = time.time()
+computational_time = end_time - start_time
+
+# Append the metrics to the DataFrame
+results_weather_mean = results_weather_mean.append({
+    'Model': 'Random Forest Classifier Mean',
+    'Accuracy': accuracy,
+    'Precision': precision,
+    'Recall': recall,
+    'F1-score': f1,
+    'ROC AUC Score': auc,
+    'Computational Time': computational_time
+}, ignore_index=True)
+
+results_weather_mean
+```
+
+### RANDOM FOREST WITH SCALED DATA (MEAN)
+```{python}
+start_time = time.time()
+
+# Fit the model to the training data
+model_rf.fit(X_train_scaled_weather, y_train)
+
+# Make predictions on the test data
+y_pred = model_rf.predict(X_test_scaled_weather)
+
+# Calculate performance metrics
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+f1 = f1_score(y_test, y_pred)
+auc = roc_auc_score(y_test, y_pred)
+
+end_time = time.time()
+computational_time = end_time - start_time
+
+# Append the metrics to the DataFrame
+results_weather_mean = results_weather_mean.append({
+    'Model': 'Random Forest Classifier Scaled Mean',
+    'Accuracy': accuracy,
+    'Precision': precision,
+    'Recall': recall,
+    'F1-score': f1,
+    'ROC AUC Score': auc,
+    'Computational Time': computational_time
+}, ignore_index=True)
+
+results_weather_mean
+```
+
+
+### GRADIENT BOOSTING WITH ALL VARIABLES (MEAN)
+```{python}
+
+start_time = time.time()
+
+# Initialize Gradient Boosting Classifier
+gb_classifier = GradientBoostingClassifier()
+
+# Fit the model
+gb_classifier.fit(X_train, y_train)
+
+# Make predictions on the test data
+y_pred_gb = gb_classifier.predict(X_test)
+
+# Calculate accuracy for the Gradient Boosting Classifier
+accuracy_gb = accuracy_score(y_test, y_pred_gb)
+precision_gb = precision_score(y_test, y_pred_gb)
+recall_gb = recall_score(y_test, y_pred_gb)
+f1_gb = f1_score(y_test, y_pred_gb)
+auc_gb = roc_auc_score(y_test, y_pred_gb)
+
+end_time = time.time()
+computational_time = end_time - start_time 
+
+# Append the metrics to the DataFrame
+results_weather_mean = results_weather_mean.append({
+    'Model': 'Gradient Boosting Classifier',
+    'Accuracy': accuracy_gb,
+    'Precision': precision_gb,
+    'Recall': recall_gb,
+    'F1-score': f1_gb,
+    'ROC AUC Score': auc_gb,
+    'Computational Time': computational_time
+}, ignore_index=True)
+
+# Print the updated DataFrame
+results_weather_mean
+```
+
+### GRADIENT BOOSTING WITH SCALED DATA (MEAN)
+```{python}
+start_time = time.time()
+# Initialize Gradient Boosting Classifier
+gb_classifier = GradientBoostingClassifier()
+
+# Fit the model
+gb_classifier.fit(X_train_scaled_weather, y_train)
+
+# Make predictions on the test data
+y_pred_gbs = gb_classifier.predict(X_test_scaled_weather)
+
+# Calculate accuracy for the Gradient Boosting Classifier
+accuracy_gbs = accuracy_score(y_test, y_pred_gbs)
+precision_gbs = precision_score(y_test, y_pred_gbs)
+recall_gbs = recall_score(y_test, y_pred_gbs)
+f1_gbs = f1_score(y_test, y_pred_gbs)
+auc_gbs = roc_auc_score(y_test, y_pred_gbs)
+
+end_time = time.time()
+computational_time = end_time - start_time
+
+# Append the metrics to the DataFrame
+results_weather_mean = results_weather_mean.append({
+    'Model': 'Gradient Boosting Classifier Scaled Mean',
+    'Accuracy': accuracy_gbs,
+    'Precision': precision_gbs,
+    'Recall': recall_gbs,
+    'F1-score': f1_gbs,
+    'ROC AUC Score': auc_gbs,
+    'Computational Time': computational_time
+}, ignore_index=True)
+
+# Print the updated DataFrame
+results_weather_mean
+```
+
+
+### KNEIGHBORS WITH ALL VARIABLES (MEAN)
+```{python}
+
+X_test = np.array(X_test)
+
+start_time = time.time()
+
+# Initialize K-Nearest Neighbors Classifier
+knn_classifier = KNeighborsClassifier()
+
+# Fit the model
+knn_classifier.fit(X_train, y_train)
+
+# Make predictions on the test data
+y_pred_knn = knn_classifier.predict(X_test)
+
+# Calculate accuracy for the K-Nearest Neighbors Classifier
+accuracy_knn = accuracy_score(y_test, y_pred_knn)
+precision_knn = precision_score(y_test, y_pred_knn)
+recall_knn = recall_score(y_test, y_pred_knn)
+f1_knn = f1_score(y_test, y_pred_knn)
+auc_knn = roc_auc_score(y_test, y_pred_knn)
+
+end_time = time.time()
+computational_time = end_time - start_time
+
+# Append the metrics to the DataFrame
+results_weather_mean = results_weather_mean.append({
+    'Model': 'KNN Classifier Mean',
+    'Accuracy': accuracy_knn,
+    'Precision': precision_knn,
+    'Recall': recall_knn,
+    'F1-score': f1_knn,
+    'ROC AUC Score': auc_knn,
+    'Computational Time': computational_time
+}, ignore_index=True)
+
+# Print the updated DataFrame
+results_weather_mean
+```
+
+### KNEIGHBORS WITH SCALED DATA (MEAN)
+```{python}
+
+X_test_scaled_weather = np.array(X_test_scaled_weather)
+
+start_time = time.time()
+
+# Fit the model
+knn_classifier.fit(X_train_scaled_weather, y_train)
+
+# Make predictions on the test data
+y_pred_knns = knn_classifier.predict(X_test_scaled_weather)
+
+# Append the accuracy score for the second model to the DataFrame
+accuracy_knns = accuracy_score(y_test, y_pred_knns)
+precision_knns = precision_score(y_test, y_pred_knns)
+recall_knns = recall_score(y_test, y_pred_knns)
+f1_knns = f1_score(y_test, y_pred_knns)
+auc_knns = roc_auc_score(y_test, y_pred_knns)
+
+end_time = time.time()
+computational_time = end_time - start_time
+
+# Append the metrics to the DataFrame
+results_weather_mean = results_weather_mean.append({
+    'Model': 'KNN Classifier Scaled Mean',
+    'Accuracy': accuracy_knns,
+    'Precision': precision_knns,
+    'Recall': recall_knns,
+    'F1-score': f1_knns,
+    'ROC AUC Score': auc_knns,
+    'Computational Time': computational_time
+}, ignore_index=True)
+
+# Print the updated DataFrame
+results_weather_mean
+```
+
+
+### ADABOOST WITH ALL VARIABLES (MEAN)
+```{python}
+
+start_time = time.time()
+# Initialize AdaBoost Classifier
+adaboost_classifier = AdaBoostClassifier()
+
+# Fit the model
+adaboost_classifier.fit(X_train, y_train)
+
+# Make predictions on the test data
+y_pred_adaboost = adaboost_classifier.predict(X_test)
+
+# Calculate accuracy for the AdaBoost Classifier
+accuracy_adaboost = accuracy_score(y_test, y_pred_adaboost)
+precision_adaboost = precision_score(y_test, y_pred_adaboost)
+recall_adaboost = recall_score(y_test, y_pred_adaboost)
+f1_adaboost = f1_score(y_test, y_pred_adaboost)
+auc_adaboost = roc_auc_score(y_test, y_pred_adaboost)
+
+end_time = time.time()
+computational_time = end_time - start_time
+
+# Append the metrics to the DataFrame
+results_weather_mean = results_weather_mean.append({
+    'Model': 'AdaBoost Classifier Mean',
+    'Accuracy': accuracy_adaboost,
+    'Precision': precision_adaboost,
+    'Recall': recall_adaboost,
+    'F1-score': f1_adaboost,
+    'ROC AUC Score': auc_adaboost,
+    'Computational Time': computational_time
+}, ignore_index=True)
+
+# Print the updated DataFrame
+results_weather_mean
+```
+
+### ADABOOST WITH SCALED DATA (MEAN)
+```{python}
+start_time = time.time()
+
+# Fit the model
+adaboost_classifier.fit(X_train_scaled_weather, y_train)
+
+# Make predictions on the test data
+y_pred_adaboost = adaboost_classifier.predict(X_test_scaled_weather)
+
+# Calculate accuracy for the AdaBoost Classifier
+accuracy_adaboost = accuracy_score(y_test, y_pred_adaboost)
+precision_adaboost = precision_score(y_test, y_pred_adaboost)
+recall_adaboost = recall_score(y_test, y_pred_adaboost)
+f1_adaboost = f1_score(y_test, y_pred_adaboost)
+auc_adaboost = roc_auc_score(y_test, y_pred_adaboost)
+
+end_time = time.time()
+computational_time = end_time - start_time
+
+# Append the metrics to the DataFrame
+results_weather_mean = results_weather_mean.append({
+    'Model': 'AdaBoost Classifier Scaled Mean',
+    'Accuracy': accuracy_adaboost,
+    'Precision': precision_adaboost,
+    'Recall': recall_adaboost,
+    'F1-score': f1_adaboost,
+    'ROC AUC Score': auc_adaboost,
+    'Computational Time': computational_time
+}, ignore_index=True)
+
+# Print the updated DataFrame
+results_weather_mean
+```
+
+
+## SHOWING THE MODEL PERFORMANCE
+
+```{python}
+results_weather_mean
+```
+
+
 # MICE IMPUTATION TECHNIQUE
 
 This technique fills missing values with the median of the non-missing values in the dataset.
@@ -2333,6 +2848,527 @@ results_weather_knn
 results_weather_knn
 ```
 
+# EM IMPUTATION TECHNIQUE
+
+## VISUALIZING THE NUMBER OF MISSING VALUES IN THE DATA SET
+
+```{python}
+# Checking for missing values
+print("\nMissing values in each column:")
+print(weather.isnull().sum())
+
+# Visualizing missing data pattern
+plt.figure(figsize=(12, 8))
+sns.heatmap(weather.isnull(), cmap='viridis', cbar=False)
+plt.title('Missing Data Pattern')
+plt.show()
+```
+
+## FILLING MISSING VALUES BY EM
+
+```{python}
+from sklearn.experimental import enable_iterative_imputer
+from sklearn.impute import IterativeImputer
+
+# Create an instance of IterativeImputer with the EM algorithm
+em_imputer = IterativeImputer(max_iter=10, random_state=0)
+
+# Impute missing values using the EM algorithm
+weather_filled_em = em_imputer.fit_transform(weather)
+
+weather_filled_em = pd.DataFrame(weather_filled_em, columns=weather.columns)
+
+# Checking for missing values
+print("\nMissing values in each column:")
+print(weather_filled_em.isnull().sum())
+
+# Visualizing missing data pattern
+plt.figure(figsize=(12, 8))
+sns.heatmap(weather_filled_em.isnull(), cmap='viridis', cbar=False)
+plt.title('Missing Data Pattern')
+plt.show()
+
+```
+
+
+## PREPROCESSING STEPS BEFORE MODELLING
+
+### SPLITTING THE DATA
+
+```{python}
+X = weather_filled_em.drop(columns = ['RainTomorrow'])
+y = weather_filled_em['RainTomorrow']
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Initialize the StandardScaler
+scaler = StandardScaler()
+
+# Fit and transform the training and testing data separately
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.fit_transform(X_test)
+
+# Convert scaled data back to DataFrames
+X_train_scaled_weather = pd.DataFrame(X_train_scaled, columns=X.columns)
+X_test_scaled_weather = pd.DataFrame(X_test_scaled, columns=X.columns)
+```
+
+
+## MODELING WITH EM
+
+### LOGISTIC REGRESSION WITH ALL VARIABLES (EM)
+
+```{python}
+
+start_time = time.time()
+
+log_model = LogisticRegression()
+
+log_model.fit(X_train, y_train)
+
+# Make predictions on the test data
+y_pred = log_model.predict(X_test)
+
+# Calculate performance metrics
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+f1 = f1_score(y_test, y_pred)
+auc = roc_auc_score(y_test, y_pred)
+
+end_time = time.time()
+computational_time = end_time - start_time
+
+# Creatin a performance scores dataframe
+results_weather_em = pd.DataFrame(columns=['Model', 'Accuracy', 'Precision', 'Recall', 'F1-score', 'ROC AUC Score', 'Computational Time'])
+
+# Append the metrics to the DataFrame
+results_weather_em = results_weather_em.append({
+    'Model': 'Logistic Regression Classifier EM',
+    'Accuracy': accuracy,
+    'Precision': precision,
+    'Recall': recall,
+    'F1-score': f1,
+    'ROC AUC Score': auc,
+    'Computational Time': computational_time
+}, ignore_index=True)
+
+results_weather_em
+```
+
+### LOGISTIC REGRESSION WITH SCALED DATA (EM)
+
+```{python}
+start_time = time.time()
+
+log_model.fit(X_train_scaled_weather, y_train)
+
+# Make predictions on the test data
+y_pred = log_model.predict(X_test_scaled_weather)
+
+# Calculate performance metrics
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+f1 = f1_score(y_test, y_pred)
+auc = roc_auc_score(y_test, y_pred)
+
+end_time = time.time()
+computational_time = end_time - start_time
+
+# Append the metrics to the DataFrame
+results_weather_em = results_weather_em.append({
+    'Model': 'Logistic Regression Classifier Scaled EM',
+    'Accuracy': accuracy,
+    'Precision': precision,
+    'Recall': recall,
+    'F1-score': f1,
+    'ROC AUC Score': auc,
+    'Computational Time': computational_time
+}, ignore_index=True)
+
+results_weather_em
+```
+
+
+### DECISION TREE WITH ALL VARIABLES (EM)
+
+```{python}
+
+start_time = time.time()
+
+# Create a Decision Tree Classifier
+dt_clf = DecisionTreeClassifier()
+
+# Fit the model to the training data
+dt_clf.fit(X_train, y_train)
+
+# Make predictions on the test data
+y_pred = dt_clf.predict(X_test)
+
+# Calculate performance metrics
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+f1 = f1_score(y_test, y_pred)
+auc = roc_auc_score(y_test, y_pred)
+
+end_time = time.time()
+computational_time = end_time - start_time
+
+# Append the metrics to the DataFrame
+results_weather_em = results_weather_em.append({
+    'Model': 'Decision Tree Classifier EM',
+    'Accuracy': accuracy,
+    'Precision': precision,
+    'Recall': recall,
+    'F1-score': f1,
+    'ROC AUC Score': auc,
+    'Computational Time': computational_time
+}, ignore_index=True)
+
+results_weather_em
+```
+
+### DECISION TREE WITH SCALED DATA (EM)
+```{python}
+start_time = time.time()
+
+# Fit the model to the training data
+dt_clf.fit(X_train_scaled_weather, y_train)
+
+# Make predictions on the test data
+y_pred = dt_clf.predict(X_test_scaled_weather)
+
+# Calculate performance metrics
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+f1 = f1_score(y_test, y_pred)
+auc = roc_auc_score(y_test, y_pred)
+
+end_time = time.time()
+computational_time = end_time - start_time 
+
+# Append the metrics to the DataFrame
+results_weather_em = results_weather_em.append({
+    'Model': 'Decision Tree Classifier Scaled EM',
+    'Accuracy': accuracy,
+    'Precision': precision,
+    'Recall': recall,
+    'F1-score': f1,
+    'ROC AUC Score': auc,
+    'Computational Time': computational_time
+}, ignore_index=True)
+
+results_weather_em
+```
+
+
+### RANDOM FOREST WITH ALL VARIABLES (EM)
+```{python}
+
+start_time = time.time()
+
+model_rf = RandomForestClassifier()
+model_rf.fit(X_train, y_train)
+
+# Make predictions on the test data
+y_pred = model_rf.predict(X_test)
+
+# Calculate performance metrics
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+f1 = f1_score(y_test, y_pred)
+auc = roc_auc_score(y_test, y_pred)
+
+end_time = time.time()
+computational_time = end_time - start_time
+
+# Append the metrics to the DataFrame
+results_weather_em = results_weather_em.append({
+    'Model': 'Random Forest Classifier EM',
+    'Accuracy': accuracy,
+    'Precision': precision,
+    'Recall': recall,
+    'F1-score': f1,
+    'ROC AUC Score': auc,
+    'Computational Time': computational_time
+}, ignore_index=True)
+
+results_weather_em
+```
+
+### RANDOM FOREST WITH SCALED DATA (EM)
+```{python}
+start_time = time.time()
+
+# Fit the model to the training data
+model_rf.fit(X_train_scaled_weather, y_train)
+
+# Make predictions on the test data
+y_pred = model_rf.predict(X_test_scaled_weather)
+
+# Calculate performance metrics
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+f1 = f1_score(y_test, y_pred)
+auc = roc_auc_score(y_test, y_pred)
+
+end_time = time.time()
+computational_time = end_time - start_time
+
+# Append the metrics to the DataFrame
+results_weather_em = results_weather_em.append({
+    'Model': 'Random Forest Classifier Scaled Mean',
+    'Accuracy': accuracy,
+    'Precision': precision,
+    'Recall': recall,
+    'F1-score': f1,
+    'ROC AUC Score': auc,
+    'Computational Time': computational_time
+}, ignore_index=True)
+
+results_weather_em
+```
+
+
+### GRADIENT BOOSTING WITH ALL VARIABLES (EM)
+```{python}
+
+start_time = time.time()
+
+# Initialize Gradient Boosting Classifier
+gb_classifier = GradientBoostingClassifier()
+
+# Fit the model
+gb_classifier.fit(X_train, y_train)
+
+# Make predictions on the test data
+y_pred_gb = gb_classifier.predict(X_test)
+
+# Calculate accuracy for the Gradient Boosting Classifier
+accuracy_gb = accuracy_score(y_test, y_pred_gb)
+precision_gb = precision_score(y_test, y_pred_gb)
+recall_gb = recall_score(y_test, y_pred_gb)
+f1_gb = f1_score(y_test, y_pred_gb)
+auc_gb = roc_auc_score(y_test, y_pred_gb)
+
+end_time = time.time()
+computational_time = end_time - start_time 
+
+# Append the metrics to the DataFrame
+results_weather_em = results_weather_em.append({
+    'Model': 'Gradient Boosting Classifier EM',
+    'Accuracy': accuracy_gb,
+    'Precision': precision_gb,
+    'Recall': recall_gb,
+    'F1-score': f1_gb,
+    'ROC AUC Score': auc_gb,
+    'Computational Time': computational_time
+}, ignore_index=True)
+
+# Print the updated DataFrame
+results_weather_em
+```
+
+### GRADIENT BOOSTING WITH SCALED DATA (EM)
+```{python}
+start_time = time.time()
+# Initialize Gradient Boosting Classifier
+gb_classifier = GradientBoostingClassifier()
+
+# Fit the model
+gb_classifier.fit(X_train_scaled_weather, y_train)
+
+# Make predictions on the test data
+y_pred_gbs = gb_classifier.predict(X_test_scaled_weather)
+
+# Calculate accuracy for the Gradient Boosting Classifier
+accuracy_gbs = accuracy_score(y_test, y_pred_gbs)
+precision_gbs = precision_score(y_test, y_pred_gbs)
+recall_gbs = recall_score(y_test, y_pred_gbs)
+f1_gbs = f1_score(y_test, y_pred_gbs)
+auc_gbs = roc_auc_score(y_test, y_pred_gbs)
+
+end_time = time.time()
+computational_time = end_time - start_time
+
+# Append the metrics to the DataFrame
+results_weather_em = results_weather_em.append({
+    'Model': 'Gradient Boosting Classifier Scaled EM',
+    'Accuracy': accuracy_gbs,
+    'Precision': precision_gbs,
+    'Recall': recall_gbs,
+    'F1-score': f1_gbs,
+    'ROC AUC Score': auc_gbs,
+    'Computational Time': computational_time
+}, ignore_index=True)
+
+# Print the updated DataFrame
+results_weather_em
+```
+
+
+### KNEIGHBORS WITH ALL VARIABLES (EM)
+```{python}
+
+X_test = np.array(X_test)
+
+start_time = time.time()
+
+# Initialize K-Nearest Neighbors Classifier
+knn_classifier = KNeighborsClassifier()
+
+# Fit the model
+knn_classifier.fit(X_train, y_train)
+
+# Make predictions on the test data
+y_pred_knn = knn_classifier.predict(X_test)
+
+# Calculate accuracy for the K-Nearest Neighbors Classifier
+accuracy_knn = accuracy_score(y_test, y_pred_knn)
+precision_knn = precision_score(y_test, y_pred_knn)
+recall_knn = recall_score(y_test, y_pred_knn)
+f1_knn = f1_score(y_test, y_pred_knn)
+auc_knn = roc_auc_score(y_test, y_pred_knn)
+
+end_time = time.time()
+computational_time = end_time - start_time
+
+# Append the metrics to the DataFrame
+results_weather_em = results_weather_em.append({
+    'Model': 'KNN Classifier EM',
+    'Accuracy': accuracy_knn,
+    'Precision': precision_knn,
+    'Recall': recall_knn,
+    'F1-score': f1_knn,
+    'ROC AUC Score': auc_knn,
+    'Computational Time': computational_time
+}, ignore_index=True)
+
+# Print the updated DataFrame
+results_weather_em
+```
+
+### KNEIGHBORS WITH SCALED DATA (EM)
+```{python}
+
+X_test_scaled_weather = np.array(X_test_scaled_weather)
+
+start_time = time.time()
+
+# Fit the model
+knn_classifier.fit(X_train_scaled_weather, y_train)
+
+# Make predictions on the test data
+y_pred_knns = knn_classifier.predict(X_test_scaled_weather)
+
+# Append the accuracy score for the second model to the DataFrame
+accuracy_knns = accuracy_score(y_test, y_pred_knns)
+precision_knns = precision_score(y_test, y_pred_knns)
+recall_knns = recall_score(y_test, y_pred_knns)
+f1_knns = f1_score(y_test, y_pred_knns)
+auc_knns = roc_auc_score(y_test, y_pred_knns)
+
+end_time = time.time()
+computational_time = end_time - start_time
+
+# Append the metrics to the DataFrame
+results_weather_em = results_weather_em.append({
+    'Model': 'KNN Classifier Scaled EM',
+    'Accuracy': accuracy_knns,
+    'Precision': precision_knns,
+    'Recall': recall_knns,
+    'F1-score': f1_knns,
+    'ROC AUC Score': auc_knns,
+    'Computational Time': computational_time
+}, ignore_index=True)
+
+# Print the updated DataFrame
+results_weather_em
+```
+
+### ADABOOST WITH ALL VARIABLES (EM)
+```{python}
+
+start_time = time.time()
+# Initialize AdaBoost Classifier
+adaboost_classifier = AdaBoostClassifier()
+
+# Fit the model
+adaboost_classifier.fit(X_train, y_train)
+
+# Make predictions on the test data
+y_pred_adaboost = adaboost_classifier.predict(X_test)
+
+# Calculate accuracy for the AdaBoost Classifier
+accuracy_adaboost = accuracy_score(y_test, y_pred_adaboost)
+precision_adaboost = precision_score(y_test, y_pred_adaboost)
+recall_adaboost = recall_score(y_test, y_pred_adaboost)
+f1_adaboost = f1_score(y_test, y_pred_adaboost)
+auc_adaboost = roc_auc_score(y_test, y_pred_adaboost)
+
+end_time = time.time()
+computational_time = end_time - start_time
+
+# Append the metrics to the DataFrame
+results_weather_em = results_weather_em.append({
+    'Model': 'AdaBoost Classifier EM',
+    'Accuracy': accuracy_adaboost,
+    'Precision': precision_adaboost,
+    'Recall': recall_adaboost,
+    'F1-score': f1_adaboost,
+    'ROC AUC Score': auc_adaboost,
+    'Computational Time': computational_time
+}, ignore_index=True)
+
+# Print the updated DataFrame
+results_weather_em
+```
+
+### ADABOOST WITH SCALED DATA (EM)
+```{python}
+start_time = time.time()
+
+# Fit the model
+adaboost_classifier.fit(X_train_scaled_weather, y_train)
+
+# Make predictions on the test data
+y_pred_adaboost = adaboost_classifier.predict(X_test_scaled_weather)
+
+# Calculate accuracy for the AdaBoost Classifier
+accuracy_adaboost = accuracy_score(y_test, y_pred_adaboost)
+precision_adaboost = precision_score(y_test, y_pred_adaboost)
+recall_adaboost = recall_score(y_test, y_pred_adaboost)
+f1_adaboost = f1_score(y_test, y_pred_adaboost)
+auc_adaboost = roc_auc_score(y_test, y_pred_adaboost)
+
+end_time = time.time()
+computational_time = end_time - start_time
+
+# Append the metrics to the DataFrame
+results_weather_em = results_weather_em.append({
+    'Model': 'AdaBoost Classifier Scaled EM',
+    'Accuracy': accuracy_adaboost,
+    'Precision': precision_adaboost,
+    'Recall': recall_adaboost,
+    'F1-score': f1_adaboost,
+    'ROC AUC Score': auc_adaboost,
+    'Computational Time': computational_time
+}, ignore_index=True)
+
+# Print the updated DataFrame
+results_weather_em
+```
+
+## SHOWING THE MODEL PERFORMANCE
+```{python}
+results_weather_em
+```
+
 
 # REGRESSION IMPUTATION TECHNIQUE
 
@@ -3433,4 +4469,492 @@ results_weather_interpolation
 #| label: show the model performance with INTERPOLATION
 
 results_weather_interpolation
+```
+
+Now, apart from the imputation techniques, I want to see that how the models will performs if i delete all the observations (rows) that contain a missing value in certain variables.
+
+# LISTWISE DELETION 
+
+```{python}
+# Drop rows with any missing values (listwise deletion)
+weather_ld = weather.dropna()
+```
+
+```{python}
+weather_ld.isnull().sum()
+```
+
+```{python}
+
+X = weather_ld.drop(columns = ['RainTomorrow'])
+y = weather_ld['RainTomorrow']
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Initialize the StandardScaler
+scaler = StandardScaler()
+
+# Fit and transform the training and testing data separately
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.fit_transform(X_test)
+
+# Convert scaled data back to DataFrames
+X_train_scaled_weather = pd.DataFrame(X_train_scaled, columns=X.columns)
+X_test_scaled_weather = pd.DataFrame(X_test_scaled, columns=X.columns)
+
+```
+
+## MODELING WITH LD
+### LOGISTIC REGRESSION (LD)
+
+```{python}
+
+start_time = time.time()
+
+log_model = LogisticRegression()
+
+log_model.fit(X_train, y_train)
+
+# Make predictions on the test data
+y_pred = log_model.predict(X_test)
+
+# Calculate performance metrics
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+f1 = f1_score(y_test, y_pred)
+auc = roc_auc_score(y_test, y_pred)
+
+end_time = time.time()
+computational_time = end_time - start_time
+
+# Creatin a performance scores dataframe
+results_weather_ld = pd.DataFrame(columns=['Model', 'Accuracy', 'Precision', 'Recall', 'F1-score', 'ROC AUC Score', 'Computational Time'])
+
+# Append the metrics to the DataFrame
+results_weather_ld = results_weather_ld.append({
+    'Model': 'Logistic Regression Classifier EM',
+    'Accuracy': accuracy,
+    'Precision': precision,
+    'Recall': recall,
+    'F1-score': f1,
+    'ROC AUC Score': auc,
+    'Computational Time': computational_time
+}, ignore_index=True)
+
+results_weather_ld
+```
+
+### LOGISTIC REGRESSION WITH SCALED DATA (LD)
+
+```{python}
+start_time = time.time()
+
+log_model.fit(X_train_scaled_weather, y_train)
+
+# Make predictions on the test data
+y_pred = log_model.predict(X_test_scaled_weather)
+
+# Calculate performance metrics
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+f1 = f1_score(y_test, y_pred)
+auc = roc_auc_score(y_test, y_pred)
+
+end_time = time.time()
+computational_time = end_time - start_time
+
+# Append the metrics to the DataFrame
+results_weather_ld = results_weather_ld.append({
+    'Model': 'Logistic Regression Classifier Scaled EM',
+    'Accuracy': accuracy,
+    'Precision': precision,
+    'Recall': recall,
+    'F1-score': f1,
+    'ROC AUC Score': auc,
+    'Computational Time': computational_time
+}, ignore_index=True)
+
+results_weather_ld
+```
+
+
+### DECISION TREE WITH ALL VARIABLES (LD)
+
+```{python}
+
+start_time = time.time()
+
+# Create a Decision Tree Classifier
+dt_clf = DecisionTreeClassifier()
+
+# Fit the model to the training data
+dt_clf.fit(X_train, y_train)
+
+# Make predictions on the test data
+y_pred = dt_clf.predict(X_test)
+
+# Calculate performance metrics
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+f1 = f1_score(y_test, y_pred)
+auc = roc_auc_score(y_test, y_pred)
+
+end_time = time.time()
+computational_time = end_time - start_time
+
+# Append the metrics to the DataFrame
+results_weather_ld = results_weather_ld.append({
+    'Model': 'Decision Tree Classifier EM',
+    'Accuracy': accuracy,
+    'Precision': precision,
+    'Recall': recall,
+    'F1-score': f1,
+    'ROC AUC Score': auc,
+    'Computational Time': computational_time
+}, ignore_index=True)
+
+results_weather_ld
+```
+
+### DECISION TREE WITH SCALED DATA (LD)
+```{python}
+start_time = time.time()
+
+# Fit the model to the training data
+dt_clf.fit(X_train_scaled_weather, y_train)
+
+# Make predictions on the test data
+y_pred = dt_clf.predict(X_test_scaled_weather)
+
+# Calculate performance metrics
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+f1 = f1_score(y_test, y_pred)
+auc = roc_auc_score(y_test, y_pred)
+
+end_time = time.time()
+computational_time = end_time - start_time 
+
+# Append the metrics to the DataFrame
+results_weather_ld = results_weather_ld.append({
+    'Model': 'Decision Tree Classifier Scaled EM',
+    'Accuracy': accuracy,
+    'Precision': precision,
+    'Recall': recall,
+    'F1-score': f1,
+    'ROC AUC Score': auc,
+    'Computational Time': computational_time
+}, ignore_index=True)
+
+results_weather_ld
+```
+
+
+### RANDOM FOREST WITH ALL VARIABLES (LD)
+```{python}
+
+start_time = time.time()
+
+model_rf = RandomForestClassifier()
+model_rf.fit(X_train, y_train)
+
+# Make predictions on the test data
+y_pred = model_rf.predict(X_test)
+
+# Calculate performance metrics
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+f1 = f1_score(y_test, y_pred)
+auc = roc_auc_score(y_test, y_pred)
+
+end_time = time.time()
+computational_time = end_time - start_time
+
+# Append the metrics to the DataFrame
+results_weather_ld = results_weather_ld.append({
+    'Model': 'Random Forest Classifier EM',
+    'Accuracy': accuracy,
+    'Precision': precision,
+    'Recall': recall,
+    'F1-score': f1,
+    'ROC AUC Score': auc,
+    'Computational Time': computational_time
+}, ignore_index=True)
+
+results_weather_ld
+```
+
+### RANDOM FOREST WITH SCALED DATA (LD)
+```{python}
+start_time = time.time()
+
+# Fit the model to the training data
+model_rf.fit(X_train_scaled_weather, y_train)
+
+# Make predictions on the test data
+y_pred = model_rf.predict(X_test_scaled_weather)
+
+# Calculate performance metrics
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+f1 = f1_score(y_test, y_pred)
+auc = roc_auc_score(y_test, y_pred)
+
+end_time = time.time()
+computational_time = end_time - start_time
+
+# Append the metrics to the DataFrame
+results_weather_ld = results_weather_ld.append({
+    'Model': 'Random Forest Classifier Scaled Mean',
+    'Accuracy': accuracy,
+    'Precision': precision,
+    'Recall': recall,
+    'F1-score': f1,
+    'ROC AUC Score': auc,
+    'Computational Time': computational_time
+}, ignore_index=True)
+
+results_weather_ld
+```
+
+
+### GRADIENT BOOSTING WITH ALL VARIABLES (LD)
+```{python}
+
+start_time = time.time()
+
+# Initialize Gradient Boosting Classifier
+gb_classifier = GradientBoostingClassifier()
+
+# Fit the model
+gb_classifier.fit(X_train, y_train)
+
+# Make predictions on the test data
+y_pred_gb = gb_classifier.predict(X_test)
+
+# Calculate accuracy for the Gradient Boosting Classifier
+accuracy_gb = accuracy_score(y_test, y_pred_gb)
+precision_gb = precision_score(y_test, y_pred_gb)
+recall_gb = recall_score(y_test, y_pred_gb)
+f1_gb = f1_score(y_test, y_pred_gb)
+auc_gb = roc_auc_score(y_test, y_pred_gb)
+
+end_time = time.time()
+computational_time = end_time - start_time 
+
+# Append the metrics to the DataFrame
+results_weather_ld = results_weather_ld.append({
+    'Model': 'Gradient Boosting Classifier EM',
+    'Accuracy': accuracy_gb,
+    'Precision': precision_gb,
+    'Recall': recall_gb,
+    'F1-score': f1_gb,
+    'ROC AUC Score': auc_gb,
+    'Computational Time': computational_time
+}, ignore_index=True)
+
+# Print the updated DataFrame
+results_weather_ld
+```
+
+### GRADIENT BOOSTING WITH SCALED DATA (LD)
+```{python}
+start_time = time.time()
+# Initialize Gradient Boosting Classifier
+gb_classifier = GradientBoostingClassifier()
+
+# Fit the model
+gb_classifier.fit(X_train_scaled_weather, y_train)
+
+# Make predictions on the test data
+y_pred_gbs = gb_classifier.predict(X_test_scaled_weather)
+
+# Calculate accuracy for the Gradient Boosting Classifier
+accuracy_gbs = accuracy_score(y_test, y_pred_gbs)
+precision_gbs = precision_score(y_test, y_pred_gbs)
+recall_gbs = recall_score(y_test, y_pred_gbs)
+f1_gbs = f1_score(y_test, y_pred_gbs)
+auc_gbs = roc_auc_score(y_test, y_pred_gbs)
+
+end_time = time.time()
+computational_time = end_time - start_time
+
+# Append the metrics to the DataFrame
+results_weather_ld = results_weather_ld.append({
+    'Model': 'Gradient Boosting Classifier Scaled EM',
+    'Accuracy': accuracy_gbs,
+    'Precision': precision_gbs,
+    'Recall': recall_gbs,
+    'F1-score': f1_gbs,
+    'ROC AUC Score': auc_gbs,
+    'Computational Time': computational_time
+}, ignore_index=True)
+
+# Print the updated DataFrame
+results_weather_ld
+```
+
+
+### KNEIGHBORS WITH ALL VARIABLES (LD)
+```{python}
+
+X_test = np.array(X_test)
+
+start_time = time.time()
+
+# Initialize K-Nearest Neighbors Classifier
+knn_classifier = KNeighborsClassifier()
+
+# Fit the model
+knn_classifier.fit(X_train, y_train)
+
+# Make predictions on the test data
+y_pred_knn = knn_classifier.predict(X_test)
+
+# Calculate accuracy for the K-Nearest Neighbors Classifier
+accuracy_knn = accuracy_score(y_test, y_pred_knn)
+precision_knn = precision_score(y_test, y_pred_knn)
+recall_knn = recall_score(y_test, y_pred_knn)
+f1_knn = f1_score(y_test, y_pred_knn)
+auc_knn = roc_auc_score(y_test, y_pred_knn)
+
+end_time = time.time()
+computational_time = end_time - start_time
+
+# Append the metrics to the DataFrame
+results_weather_ld = results_weather_ld.append({
+    'Model': 'KNN Classifier EM',
+    'Accuracy': accuracy_knn,
+    'Precision': precision_knn,
+    'Recall': recall_knn,
+    'F1-score': f1_knn,
+    'ROC AUC Score': auc_knn,
+    'Computational Time': computational_time
+}, ignore_index=True)
+
+# Print the updated DataFrame
+results_weather_ld
+```
+
+### KNEIGHBORS WITH SCALED DATA (LD)
+```{python}
+
+X_test_scaled_weather = np.array(X_test_scaled_weather)
+
+start_time = time.time()
+
+# Fit the model
+knn_classifier.fit(X_train_scaled_weather, y_train)
+
+# Make predictions on the test data
+y_pred_knns = knn_classifier.predict(X_test_scaled_weather)
+
+# Append the accuracy score for the second model to the DataFrame
+accuracy_knns = accuracy_score(y_test, y_pred_knns)
+precision_knns = precision_score(y_test, y_pred_knns)
+recall_knns = recall_score(y_test, y_pred_knns)
+f1_knns = f1_score(y_test, y_pred_knns)
+auc_knns = roc_auc_score(y_test, y_pred_knns)
+
+end_time = time.time()
+computational_time = end_time - start_time
+
+# Append the metrics to the DataFrame
+results_weather_ld = results_weather_ld.append({
+    'Model': 'KNN Classifier Scaled EM',
+    'Accuracy': accuracy_knns,
+    'Precision': precision_knns,
+    'Recall': recall_knns,
+    'F1-score': f1_knns,
+    'ROC AUC Score': auc_knns,
+    'Computational Time': computational_time
+}, ignore_index=True)
+
+# Print the updated DataFrame
+results_weather_ld
+```
+
+### ADABOOST WITH ALL VARIABLES (LD)
+```{python}
+
+start_time = time.time()
+# Initialize AdaBoost Classifier
+adaboost_classifier = AdaBoostClassifier()
+
+# Fit the model
+adaboost_classifier.fit(X_train, y_train)
+
+# Make predictions on the test data
+y_pred_adaboost = adaboost_classifier.predict(X_test)
+
+# Calculate accuracy for the AdaBoost Classifier
+accuracy_adaboost = accuracy_score(y_test, y_pred_adaboost)
+precision_adaboost = precision_score(y_test, y_pred_adaboost)
+recall_adaboost = recall_score(y_test, y_pred_adaboost)
+f1_adaboost = f1_score(y_test, y_pred_adaboost)
+auc_adaboost = roc_auc_score(y_test, y_pred_adaboost)
+
+end_time = time.time()
+computational_time = end_time - start_time
+
+# Append the metrics to the DataFrame
+results_weather_ld = results_weather_ld.append({
+    'Model': 'AdaBoost Classifier EM',
+    'Accuracy': accuracy_adaboost,
+    'Precision': precision_adaboost,
+    'Recall': recall_adaboost,
+    'F1-score': f1_adaboost,
+    'ROC AUC Score': auc_adaboost,
+    'Computational Time': computational_time
+}, ignore_index=True)
+
+# Print the updated DataFrame
+results_weather_ld
+```
+
+### ADABOOST WITH SCALED DATA (LD)
+```{python}
+start_time = time.time()
+
+# Fit the model
+adaboost_classifier.fit(X_train_scaled_weather, y_train)
+
+# Make predictions on the test data
+y_pred_adaboost = adaboost_classifier.predict(X_test_scaled_weather)
+
+# Calculate accuracy for the AdaBoost Classifier
+accuracy_adaboost = accuracy_score(y_test, y_pred_adaboost)
+precision_adaboost = precision_score(y_test, y_pred_adaboost)
+recall_adaboost = recall_score(y_test, y_pred_adaboost)
+f1_adaboost = f1_score(y_test, y_pred_adaboost)
+auc_adaboost = roc_auc_score(y_test, y_pred_adaboost)
+
+end_time = time.time()
+computational_time = end_time - start_time
+
+# Append the metrics to the DataFrame
+results_weather_ld = results_weather_ld.append({
+    'Model': 'AdaBoost Classifier Scaled EM',
+    'Accuracy': accuracy_adaboost,
+    'Precision': precision_adaboost,
+    'Recall': recall_adaboost,
+    'F1-score': f1_adaboost,
+    'ROC AUC Score': auc_adaboost,
+    'Computational Time': computational_time
+}, ignore_index=True)
+
+# Print the updated DataFrame
+results_weather_ld
+```
+
+## SHOWING THE MODEL PERFORMANCE
+
+```{python}
+results_weather_ld
 ```
